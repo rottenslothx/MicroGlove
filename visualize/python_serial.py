@@ -117,21 +117,30 @@ if __name__ == '__main__':
                 }
                 # print(attributes)
                 if finger[0] == 0 and float(angle[1]) > 40 and int(attributes[1]) == 1:
-                    thr_fingerche.start()
+                    with open("./finger1.txt", "w") as f:
+                        f.write("1")
                     finger[0] = 1
                 if float(angle[1]) <20 and int(attributes[1]) == 1:
+                    with open("./finger1.txt", "w") as f:
+                        f.write("0")
                     finger[0] = 0
 
                 if finger[1] == 0 and float(angle[1]) > 50 and int(attributes[1]) == 2:
-                    thr_fingermid.start()
+                    with open("./finger2.txt", "w") as f:
+                        f.write("1")
                     finger[1] = 1
                 if float(angle[1]) < 20 and int(attributes[1]) == 2:
+                    with open("./finger2.txt", "w") as f:
+                        f.write("0")
                     finger[1] = 0
 
                 if finger[2] == 0 and float(angle[1]) > 20 and int(attributes[1]) == 3:
-                    thr_finger3rd.start()
+                    with open("./finger3.txt", "w") as f:
+                        f.write("1")
                     finger[2] = 1
                 if float(angle[1]) < 10 and int(attributes[1]) == 3:
+                    with open("./finger3.txt", "w") as f:
+                        f.write("0")
                     finger[2] = 0
 
                 print(data)
