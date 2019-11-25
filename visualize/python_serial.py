@@ -12,16 +12,39 @@ print("connected to: " + ser.portstr)
 line_temp = ""
 
 
-def thread_function(name):
-    logging.info("Thread %s: starting", name)
-    time.sleep(2)
-    logging.info("Thread %s: finishing", name)
-
 def read_all_filtered_out():
     global ser
     line_temp = ""
     attributes = []
-    data = {}
+    datalist = [{
+                    "result": 0,
+                    "id": 0,
+                    "delta_time":0,
+                    "angle_x":0,
+                    "angle_y":0,
+                    "angle_z":0
+                },{
+                    "result": 0,
+                    "id": 0,
+                    "delta_time":0,
+                    "angle_x":0,
+                    "angle_y":0,
+                    "angle_z":0
+                },{
+                    "result": 0,
+                    "id": 0,
+                    "delta_time":0,
+                    "angle_x":0,
+                    "angle_y":0,
+                    "angle_z":0
+                },{
+                    "result": 0,
+                    "id": 0,
+                    "delta_time":0,
+                    "angle_x":0,
+                    "angle_y":0,
+                    "angle_z":0
+                }]
     while len(attributes) < 6:
         for line in ser.read():
             # print(chr(line)+"("+str(line)+")",end='')
@@ -54,6 +77,7 @@ def read_all_filtered_out():
                     "angle_y":angle[1],
                     "angle_z":angle[2]
                 }
+                datalist[int(attributes[1])]=data
                 # print(attributes)
                 print(data)
                 print()
@@ -65,26 +89,56 @@ def terminate():
     global ser 
     ser.close()
 
-def sound1(name):
-    winsound.PlaySound("68441__pinkyfinger__piano-c.wav", winsound.SND_ASYNC | winsound.SND_ALIAS )
-    time.sleep(2)
-    
-def sound2(name):
-    winsound.PlaySound("68442__pinkyfinger__piano-d.wav", winsound.SND_ASYNC | winsound.SND_ALIAS )
-    time.sleep(2)
-
-def sound3(name):
-    winsound.PlaySound("68443__pinkyfinger__piano-e.wav", winsound.SND_ASYNC | winsound.SND_ALIAS )
-    time.sleep(2)
-
 
 if __name__ == '__main__':
+    mode = 0
     finger = [0,0,0]
+    one = 0
+    two = 0
+    three = 0
+    four = [0,0,0]
+    five = 0
+    six = 0
+    seven = 0
+    cal1 = 0
+    cal2 = 0
+    cal3 = 0
+    cal4 = 0
+    cal5 = 0
+    cal6 = 0
+    cal7 = 0
+    count = 1
+    datalist = [{
+                    "result": 0,
+                    "id": 0,
+                    "delta_time":0,
+                    "angle_x":0,
+                    "angle_y":0,
+                    "angle_z":0
+                },{
+                    "result": 0,
+                    "id": 0,
+                    "delta_time":0,
+                    "angle_x":0,
+                    "angle_y":0,
+                    "angle_z":0
+                },{
+                    "result": 0,
+                    "id": 0,
+                    "delta_time":0,
+                    "angle_x":0,
+                    "angle_y":0,
+                    "angle_z":0
+                },{
+                    "result": 0,
+                    "id": 0,
+                    "delta_time":0,
+                    "angle_x":0,
+                    "angle_y":0,
+                    "angle_z":0
+                }]
     while True:
         for line in ser.read():
-            thr_fingerche = threading.Thread(target=sound1, args=(1,))
-            thr_fingermid = threading.Thread(target=sound2, args=(1,))
-            thr_finger3rd = threading.Thread(target=sound3, args=(1,))
             # print(chr(line)+"("+str(line)+")",end='')
             # print(chr(line),end='')
             if line == 0xa :
@@ -95,11 +149,14 @@ if __name__ == '__main__':
                         attributes.append(sub_attribute)
                 if len(attributes) < 6 :
                     print(line_temp)
+                    if int(attributes[1]) < 2000:
+                        mode = 0
+                    else:
+                        mode = 1
                     #clear if no collect char from a 1st char or not collect all data
                     line_temp = ""
                     break
-                if attributes[0] != "Index" and attributes[2] != "DEL" \
-                    and attributes[4] != "FIL":
+                if attributes[0] != "Index" and attributes[2] != "DEL" and attributes[4] != "FIL":
                     #clear if no collect char from a 1st char or not collect all data
                     line_temp = "" 
                     break
@@ -115,36 +172,179 @@ if __name__ == '__main__':
                     "angle_y":angle[1],
                     "angle_z":angle[2]
                 }
+                datalist[int(attributes[1])]=data
+                if count == 1:
+                    print("Calibrate!")
+                    time.sleep(3)
+                    count+=1
+                if count < 500:
+                    if int(datalist[0]["id"]) == 0:
+                        cal1 += float(datalist[0]["angle_y"])
+                        one = (cal1/count) + 40
+                    if int(datalist[1]["id"]) == 1:
+                        cal2 += float(datalist[1]["angle_y"])
+                        two = (cal2/count) + 20
+                    if int(datalist[2]["id"]) == 2:
+                        cal3 += float(datalist[2]["angle_y"])
+                        three = (cal3/count) + 25
+                    if int(datalist[3]["id"]) == 3:
+                        cal4 += float(datalist[3]["angle_y"])
+                        four[0] = (cal4/count)
+                    count+=1
+                    print(one,' ',two,' ',three,)
+                elif count == 500:
+                    print("wait for next calibrate!")
+                    time.sleep(3)
+                    count+=1
+                elif count > 500 and count < 1000:
+                    if int(datalist[3]["id"]) == 3:
+                        cal4 += float(datalist[3]["angle_y"])
+                        four[1] = (cal4/count)
+                    if int(datalist[0]["id"]) == 0:
+                        cal5 += float(datalist[0]["angle_y"])
+                        five = (cal5/count) + 40
+                    if int(datalist[1]["id"]) == 1:
+                        cal6 += float(datalist[1]["angle_y"])
+                        six = (cal6/count) + 20
+                    if int(datalist[2]["id"]) == 2:
+                        cal7 += float(datalist[2]["angle_y"])
+                        seven = (cal7/count) + 25
+                    count+=1
+                    print(five,' ',six,' ',seven)
+                elif count == 1000:
+                    print("Sucess!")
+                    count+=1
+                    time.sleep(3)
+                four[2] = ((four[0]+four[1])/2) + 20
+                print(one,' ',two,' ',three,' ',four[2],' ',five,' ',six,' ',seven)
+
                 # print(attributes)
-                if finger[0] == 0 and float(angle[1]) > 40 and int(attributes[1]) == 1:
-                    with open("./finger1.txt", "w") as f:
-                        f.write("1")
-                    finger[0] = 1
-                if float(angle[1]) <20 and int(attributes[1]) == 1:
-                    with open("./finger1.txt", "w") as f:
-                        f.write("0")
-                    finger[0] = 0
+                if mode == 0:
+                    if float(datalist[3]["angle_y"]) < four[2] and int(datalist[3]["id"]) == 3:
+                        #print("in")
+                        if finger[0] == 0 and float(datalist[0]["angle_y"]) > one and int(datalist[0]["id"]) == 0:
+                            print('1')
+                            with open("./finger1.txt", "w") as f:
+                                f.write("100")
+                            finger[0] = 1
+                        elif float(datalist[0]["angle_y"]) < one and int(datalist[0]["id"]) == 0:
+                            with open("./finger1.txt", "w") as f:
+                                f.write("000")
+                            finger[0] = 0
 
-                if finger[1] == 0 and float(angle[1]) > 50 and int(attributes[1]) == 2:
-                    with open("./finger2.txt", "w") as f:
-                        f.write("1")
-                    finger[1] = 1
-                if float(angle[1]) < 20 and int(attributes[1]) == 2:
-                    with open("./finger2.txt", "w") as f:
-                        f.write("0")
-                    finger[1] = 0
+                        if finger[1] == 0 and float(datalist[1]["angle_y"]) > two and int(datalist[1]["id"]) == 1:
+                            print('2')
+                            with open("./finger2.txt", "w") as f:
+                                f.write("100")
+                            finger[1] = 1
+                        elif float(datalist[1]["angle_y"]) < two and int(datalist[1]["id"]) == 1:
+                            with open("./finger2.txt", "w") as f:
+                                f.write("000")
+                            finger[1] = 0
 
-                if finger[2] == 0 and float(angle[1]) > 20 and int(attributes[1]) == 3:
-                    with open("./finger3.txt", "w") as f:
-                        f.write("1")
-                    finger[2] = 1
-                if float(angle[1]) < 10 and int(attributes[1]) == 3:
-                    with open("./finger3.txt", "w") as f:
-                        f.write("0")
-                    finger[2] = 0
+                        if finger[2] == 0 and float(datalist[2]["angle_y"]) > three and int(datalist[2]["id"]) == 2:
+                            print('3')
+                            with open("./finger3.txt", "w") as f:
+                                f.write("100")
+                            finger[2] = 1
+                        elif float(datalist[2]["angle_y"]) < three and int(datalist[2]["id"]) == 2:
+                            with open("./finger3.txt", "w") as f:
+                                f.write("000")
+                            finger[2] = 0
+                    if float(datalist[3]["angle_y"]) > four[2] and int(datalist[3]["id"]) == 3:
+                        if finger[0] == 0 and float(datalist[0]["angle_y"]) > five and int(datalist[0]["id"]) == 0:
+                            print('1')
+                            with open("./finger1.txt", "w") as f:
+                                f.write("110")
+                            finger[0] = 1
+                        elif float(datalist[0]["angle_y"]) < five and int(datalist[0]["id"]) == 0:
+                            with open("./finger1.txt", "w") as f:
+                                f.write("010")
+                            finger[0] = 0
 
+                        if finger[1] == 0 and float(datalist[1]["angle_y"]) > six and int(datalist[1]["id"]) == 1:
+                            print('2')
+                            with open("./finger2.txt", "w") as f:
+                                f.write("110")
+                            finger[1] = 1
+                        elif float(datalist[1]["angle_y"]) < six and int(datalist[1]["id"]) == 1:
+                            with open("./finger2.txt", "w") as f:
+                                f.write("010")
+                            finger[1] = 0
+
+                        if finger[2] == 0 and float(datalist[2]["angle_y"]) > seven and int(datalist[2]["id"]) == 2:
+                            print('3')
+                            with open("./finger3.txt", "w") as f:
+                                f.write("110")
+                            finger[2] = 1
+                        elif float(datalist[2]["angle_y"]) < seven and int(datalist[2]["id"]) == 2:
+                            with open("./finger3.txt", "w") as f:
+                                f.write("010")
+                            finger[2] = 0
+                elif mode == 1:
+                    if float(datalist[3]["angle_y"]) < four[2] and int(datalist[3]["id"]) == 3:
+                        print("in")
+                        if finger[0] == 0 and float(datalist[0]["angle_y"]) > one and int(datalist[0]["id"]) == 0:
+                            print('1')
+                            with open("./finger1.txt", "w") as f:
+                                f.write("101")
+                            finger[0] = 1
+                        elif float(datalist[0]["angle_y"]) < one and int(datalist[0]["id"]) == 0:
+                            with open("./finger1.txt", "w") as f:
+                                f.write("001")
+                            finger[0] = 0
+
+                        if finger[1] == 0 and float(datalist[1]["angle_y"]) > two and int(datalist[1]["id"]) == 1:
+                            print('2')
+                            with open("./finger2.txt", "w") as f:
+                                f.write("101")
+                            finger[1] = 1
+                        elif float(datalist[1]["angle_y"]) < two and int(datalist[1]["id"]) == 1:
+                            with open("./finger2.txt", "w") as f:
+                                f.write("001")
+                            finger[1] = 0
+
+                        if finger[2] == 0 and float(datalist[2]["angle_y"]) > three and int(datalist[2]["id"]) == 2:
+                            print('3')
+                            with open("./finger3.txt", "w") as f:
+                                f.write("101")
+                            finger[2] = 1
+                        elif float(datalist[2]["angle_y"]) < three and int(datalist[2]["id"]) == 2:
+                            with open("./finger3.txt", "w") as f:
+                                f.write("001")
+                            finger[2] = 0
+                    if float(datalist[3]["angle_y"]) > four[2] and int(datalist[3]["id"]) == 3:
+                        if finger[0] == 0 and float(datalist[0]["angle_y"]) > five and int(datalist[0]["id"]) == 0:
+                            print('1')
+                            with open("./finger1.txt", "w") as f:
+                                f.write("111")
+                            finger[0] = 1
+                        elif float(datalist[0]["angle_y"]) < five and int(datalist[0]["id"]) == 0:
+                            with open("./finger1.txt", "w") as f:
+                                f.write("011")
+                            finger[0] = 0
+
+                        if finger[1] == 0 and float(datalist[1]["angle_y"]) > six and int(datalist[1]["id"]) == 1:
+                            print('2')
+                            with open("./finger2.txt", "w") as f:
+                                f.write("111")
+                            finger[1] = 1
+                        elif float(datalist[1]["angle_y"]) < six and int(datalist[1]["id"]) == 1:
+                            with open("./finger2.txt", "w") as f:
+                                f.write("011")
+                            finger[1] = 0
+
+                        if finger[2] == 0 and float(datalist[2]["angle_y"]) > seven and int(datalist[2]["id"]) == 2:
+                            print('3')
+                            with open("./finger3.txt", "w") as f:
+                                f.write("111")
+                            finger[2] = 1
+                        elif float(datalist[2]["angle_y"]) < seven and int(datalist[2]["id"]) == 2:
+                            with open("./finger3.txt", "w") as f:
+                                f.write("011")
+                            finger[2] = 0
                 print(data)
-                print()
+                #print()
                 line_temp = ""
             else :
                 line_temp+=chr(line)
